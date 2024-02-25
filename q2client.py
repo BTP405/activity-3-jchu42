@@ -13,12 +13,14 @@ workersRequired = 10
 
 def work(num):
     time.sleep(1)
-    print (num)
+    print (num) # printed at worker side
     time.sleep(1)
-    return num**5
+    return num**5 # large value is returned to client where it is then printed
 
 def handle_worker():
+    global finished
     global connected
+    cnt = connected + finished
     with connectedLock:
         connected += 1
     print ("Waiting for connection")
@@ -27,7 +29,7 @@ def handle_worker():
     try:
         print("Connection to:", worker_address)
 
-        worker_socket.send(marshal.dumps((work.__code__, (connected,))))
+        worker_socket.send(marshal.dumps((work.__code__, (cnt,))))
         #worker_socket.send(marshal.dumps((connected,))) # tuple
         print ("data sent to", worker_address)
         res = worker_socket.recv(1024)
@@ -35,7 +37,6 @@ def handle_worker():
         res = pickle.loads(res)
         print (res)
         with finishedLock:
-            global finished
             finished += 1
     #except pickle.PickleError:
     #    print ("unpicklable")

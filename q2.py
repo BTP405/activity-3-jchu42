@@ -7,6 +7,7 @@ import threading
 import marshal
 import types
 import time
+import multiprocessing
 
 
 def run_worker():
@@ -29,11 +30,11 @@ def run_worker():
         client_socket.close()
 
 if __name__ == "__main__":
-    threads = []
+    processes = []
     for i in range(10): # number of workers
-        thread = threading.Thread(target=run_worker)
-        thread.start()
-        threads.append(thread)
+        process = multiprocessing.Process(target=run_worker)
+        process.start()
+        processes.append(process)
         time.sleep(1)
-    for thread in threads:
-        thread.join()
+    for process in processes:
+        process.join()
